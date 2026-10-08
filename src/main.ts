@@ -22,13 +22,18 @@ async function init(): Promise<void> {
   setStatus('Loading locations…');
 
   // Fetch data in parallel with the map style loading.
-  const [locations] = await Promise.all([
-    getLocations(),
+  const [{ collection, unlocated }] = await Promise.all([
+    getLocations(token),
     new Promise<void>((resolve) => map.once('load', () => resolve())),
   ]);
 
-  addEventsLayer(map, locations);
-  setStatus(null);
+  addEventsLayer(map, collection);
+  if (unlocated.length > 0) {
+    const names = unlocated.map((l) => l.name).join(', ');
+    setStatus(`Couldn't find ${unlocated.length} address(es): ${names}`, true);
+  } else {
+    setStatus(null);
+  }
 }
 
 init().catch((err) => {

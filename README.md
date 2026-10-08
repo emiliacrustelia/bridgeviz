@@ -12,7 +12,10 @@ npm run dev
 
 ## Structure
 
-- `src/data/locations.json` – hard-coded locations (GeoJSON FeatureCollection, coordinates are `[lng, lat]`)
+- `src/data/locations.json` – hard-coded locations; each has a full street `address`, and optionally
+  `coordinates` (`[lng, lat]`) for spots without a usable address
+- `src/data/geocode.ts` – turns addresses into map positions via the Mapbox Geocoding API (v6)
+- `src/config.ts` – map region; also biases address lookups toward that area
 - `src/data/eventsService.ts` – `getLocations()`; the only place that knows where data comes from
 - `src/types.ts` – `EventLocation`, the per-pin data contract
 - `src/map.ts` – map setup, clustered pin layers, click/hover handling
@@ -20,8 +23,13 @@ npm run dev
 
 ## Moving to an API
 
-Replace the body of `getLocations()` with a `fetch` call. The endpoint should return a GeoJSON
-`FeatureCollection` whose feature `properties` match `EventLocation` in `src/types.ts`.
+Replace the JSON import in `getLocations()` with a `fetch` call. The endpoint should return an array
+of objects matching `LocationRecord` in `src/types.ts`.
+
+Addresses are currently geocoded in the browser on every page load (one API request per location).
+That's fine for a PoC, but with a database the backend should geocode once when a location is saved
+and store the coordinates. Note that Mapbox's terms only allow storing results from its *permanent*
+geocoding mode, which is billed separately.
 
 ## Deploying to GitHub Pages
 

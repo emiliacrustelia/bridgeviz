@@ -1,5 +1,6 @@
 import mapboxgl, { type GeoJSONSource, type MapMouseEvent } from 'mapbox-gl';
 import type { EventFeatureCollection, EventLocation } from './types';
+import { REGION_CENTER } from './config';
 import { STATUS_COLORS } from './status';
 import { hideDetails, showDetails } from './ui/detailPanel';
 import { escapeHtml } from './ui/format';
@@ -9,14 +10,12 @@ const CLUSTER_LAYER = 'event-clusters';
 const CLUSTER_COUNT_LAYER = 'event-cluster-count';
 const PIN_LAYER = 'event-pins';
 
-const NYC_CENTER: [number, number] = [-73.96, 40.75];
-
 export function createMap(container: string, token: string): mapboxgl.Map {
   mapboxgl.accessToken = token;
   const map = new mapboxgl.Map({
     container,
     style: 'mapbox://styles/mapbox/light-v11',
-    center: NYC_CENTER,
+    center: REGION_CENTER,
     zoom: 11,
   });
   map.addControl(new mapboxgl.NavigationControl(), 'top-left');

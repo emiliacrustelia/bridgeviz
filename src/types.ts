@@ -6,6 +6,7 @@ export type LocationStatus = 'active' | 'not active';
 export interface EventLocation {
   id: string;
   name: string;
+  /** Full street address; used to place the pin unless `coordinates` is given. */
   address: string;
   status: LocationStatus;
   organizers: string;
@@ -15,6 +16,12 @@ export interface EventLocation {
   /** positive integers */
   avgCars: number;
   avgHonks: number;
+}
+
+/** A location as stored in the data source: coordinates are optional overrides. */
+export interface LocationRecord extends EventLocation {
+  /** [longitude, latitude]; set this for spots without a usable street address. */
+  coordinates?: [number, number];
 }
 
 export type EventFeature = Feature<Point, EventLocation>;
