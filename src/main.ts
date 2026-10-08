@@ -1,7 +1,12 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './style.css';
-import { getLocations } from './data/eventsService';
-import { addEventsLayer, createMap } from './map';
+import { Actions } from './actions';
+import { StaticLocationsRepository } from './data/staticRepository';
+import { bindLocationsLayer, createMap } from './map';
+import { initialState, Store } from './state';
+import { bindDetailView } from './ui/detailView';
+import { bindListView } from './ui/listView';
+import { bindPanel } from './ui/panel';
 
 const status = document.getElementById('status') as HTMLElement;
 
@@ -18,19 +23,23 @@ async function init(): Promise<void> {
     return;
   }
 
-  const map = createMap('map', token);
+  const store = new Store(initialState);
+  const actions = new Actions(store, new StaticLocationsRepository(token));
+
+  bindPanel(store, actions);
+  bindListView(store, actions);
+  bindDetailView(store, actions);
+
+  const map = createMap(document.getElementById('map')!, token);
   setStatus('Loading locations…');
 
-  // Fetch data in parallel with the map style loading.
-  const [{ collection, unlocated }] = await Promise.all([
-    getLocations(token),
-    new Promise<void>((resolve) => map.once('load', () => resolve())),
-  ]);
+  // Load data in parallel with the map style.
+  await Promise.all([actions.init(), new Promise<void>((resolve) => map.once('load', () => resolve()))]);
+  bindLocationsLayer(map, store, actions);
 
-  addEventsLayer(map, collection);
-  if (unlocated.length > 0) {
-    const names = unlocated.map((l) => l.name).join(', ');
-    setStatus(`Couldn't find ${unlocated.length} address(es): ${names}`, true);
+  const unplaced = store.get().results.filter((l) => !l.position);
+  if (unplaced.length > 0) {
+    setStatus(`Couldn't find ${unplaced.length} address(es): ${unplaced.map((l) => l.name).join(', ')}`, true);
   } else {
     setStatus(null);
   }

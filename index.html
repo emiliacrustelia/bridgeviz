@@ -6,9 +6,64 @@
     <title>BridgeViz – Events Map</title>
   </head>
   <body>
-    <div id="map"></div>
-    <aside id="detail-panel" class="detail-panel" hidden aria-live="polite"></aside>
-    <div id="status" class="status" hidden></div>
+    <div class="app">
+      <main class="map-wrap">
+        <div id="map"></div>
+        <button id="list-toggle" class="list-toggle" type="button" aria-controls="side-panel" aria-expanded="false" title="Show list">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="9" y1="6" x2="20" y2="6" /><line x1="9" y1="12" x2="20" y2="12" /><line x1="9" y1="18" x2="20" y2="18" />
+            <circle cx="4.5" cy="6" r="1" fill="currentColor" /><circle cx="4.5" cy="12" r="1" fill="currentColor" /><circle cx="4.5" cy="18" r="1" fill="currentColor" />
+          </svg>
+          <span class="visually-hidden">Location list</span>
+        </button>
+        <div id="status" class="status" hidden></div>
+      </main>
+
+      <aside id="side-panel" class="side-panel" hidden aria-label="Locations">
+        <section id="list-view" class="list-view">
+          <header class="panel-header">
+            <h2>Locations</h2>
+            <button class="icon-btn" type="button" data-action="close-panel" aria-label="Close list">×</button>
+          </header>
+
+          <form id="filters" class="filters" autocomplete="off">
+            <input id="filter-search" type="search" placeholder="Search by name" aria-label="Search by name" />
+            <fieldset class="filter-status">
+              <legend>Status</legend>
+              <label><input type="checkbox" name="status" value="active" checked /> Active</label>
+              <label><input type="checkbox" name="status" value="not active" checked /> Not active</label>
+            </fieldset>
+            <fieldset class="filter-dates">
+              <legend>Last or next event between</legend>
+              <input id="filter-from" type="date" aria-label="From date" />
+              <span aria-hidden="true">–</span>
+              <input id="filter-to" type="date" aria-label="To date" />
+            </fieldset>
+            <label class="filter-area" title="Coming soon">
+              <span>Area</span>
+              <select disabled><option>All areas (coming soon)</option></select>
+            </label>
+          </form>
+
+          <div class="list-meta">
+            <span id="result-count" aria-live="polite"></span>
+            <button id="clear-filters" class="link-btn" type="button">Clear filters</button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="locations-table">
+              <thead>
+                <tr><th>Name</th><th>Status</th><th>Last event</th><th>Next event</th><th class="num">Cars</th><th class="num">Honks</th></tr>
+              </thead>
+              <tbody id="locations-body"></tbody>
+            </table>
+            <p id="empty-state" class="empty-state" hidden>No locations match these filters.</p>
+          </div>
+        </section>
+
+        <section id="detail-view" class="detail-view" hidden></section>
+      </aside>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
